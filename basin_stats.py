@@ -67,7 +67,7 @@ def get_huc_nrcs_stats(huc_level='6', try_all=False, export_dirs=[],
                        logger=None):
     
     print_and_log(f'  Getting NRCS stats for HUC{huc_level}...', logger)
-    curr_mst = dt.now(MST).strftime('%b %I %Y %H %p $Z')
+    curr_mst = dt.now(MST).strftime('%b %I %Y %H %p %Z')
     data_types = ['prec', 'wteq']
     index_pg_urls = [f'{NRCS_CHARTS_URL}/{i.upper()}/assocHUC{huc_level}' 
                      for i in data_types]
