@@ -111,3 +111,6 @@ dmypy.json
 *.json
 *.geojson
 *.topojson
+
+# log file
+basin_stats.log
