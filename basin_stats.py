@@ -147,7 +147,7 @@ def get_huc_nrcs_stats(huc_level='6', try_all=False, export_dirs=[],
     for export_dir in export_dirs:
         if path.isdir(export_dir):
             print_and_log(
-                f'Exporting to alt dir: {export_dir}', 
+                f'  Exporting to alt dir: {export_dir}', 
                 logger
             )
             add_geo_path = path.join(
@@ -162,7 +162,7 @@ def get_huc_nrcs_stats(huc_level='6', try_all=False, export_dirs=[],
             topo_export_paths.append(add_topo_path)
         else:
             print_and_log(
-                f'Cannot export to alt dir: {export_dir}, does not exist',
+                f'  Cannot export to alt dir: {export_dir}, does not exist',
                 logger
             )
     for export_path in geo_export_paths:
@@ -203,8 +203,8 @@ if __name__ == '__main__':
     cli_desc = 'Updates topo/geojson HUC layers in gis folder with NRCS basin stats, can also export files to other locations'
     parser = argparse.ArgumentParser(description=cli_desc)
     parser.add_argument("-V", "--version", help="show program version", action="store_true")
-    parser.add_argument("-l", "--level", help="Updates single HUC level or multiple seperated by commas. Will update all without this flag")
-    parser.add_argument("-e", "--export", help="Additional path to write HUC layers to.", action='append')
+    parser.add_argument("-l", "--level", help="Updates single HUC level.", action="append")
+    parser.add_argument("-e", "--export", help="Additional path to write HUC layers to.", action="append")
     
     args = parser.parse_args()
     
@@ -213,17 +213,24 @@ if __name__ == '__main__':
     
     valid_hucs = ['2', '4', '6', '8']
     if args.level:
-        huc_levels = args.level.split(',')
-        huc_levels[:] = [str(i) for i in huc_levels if str(i) in valid_hucs]
+        huc_levels = [str(i) for i in args.level if str(i) in valid_hucs]
     else:
         huc_levels = ['2', '4', '6', '8']
+    huc_level_str = ", ".join(huc_levels)
     
     export_dirs = []
+    export_str = ''
     if args.export:
         export_dirs = args.export
-    
+        export_str = f' to {", ".join(export_dirs)}'
+        
     this_dir = path.dirname(path.realpath(__file__))
     logger = create_log(path.join(this_dir, 'basin_stats.log'))
+
+    print_and_log(
+        f'Gathering NRCS Basin Stats for HUC(s) {huc_level_str}{export_str}\n', 
+        logger
+    )
     for huc_level in huc_levels:
         
         gis_dir = path.join(this_dir, 'gis')
