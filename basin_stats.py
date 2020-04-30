@@ -18,8 +18,8 @@ STATIC_URL = f'https://www.usbr.gov/uc/water/hydrodata/assets'
 NRCS_CHARTS_URL = 'https://www.nrcs.usda.gov/Internet/WCIS/basinCharts/POR'
 MST = pytz.timezone('MST')
 
-def create_log(path='ff_gen.log'):
-    logger = logging.getLogger('ff_gen rotating log')
+def create_log(path='basin_stats.log'):
+    logger = logging.getLogger('basin_stats rotating log')
     logger.setLevel(logging.INFO)
 
     handler = TimedRotatingFileHandler(
