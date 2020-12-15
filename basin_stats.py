@@ -15,7 +15,7 @@ from logging.handlers import TimedRotatingFileHandler
 from requests import get as r_get
 
 STATIC_URL = f'https://www.usbr.gov/uc/water/hydrodata/assets'
-NRCS_CHARTS_URL = 'https://www.nrcs.usda.gov/Internet/WCIS/basinCharts/POR'
+NRCS_CHARTS_URL = 'https://www.nrcs.usda.gov/Internet/WCIS/AWS_PLOTS/basinCharts/POR'
 MST = pytz.timezone('MST')
 
 def create_log(path='basin_stats.log'):
