@@ -82,8 +82,7 @@ def get_huc_nrcs_stats(huc_level='6', try_all=False, export_dirs=[],
         index_page_strs = ['' for i in index_pg_resps]
     else:
         index_page_strs = [i.text for i in index_pg_resps]
-    global a
-    a = index_page_strs
+
     topo_json_path = f'./gis/HUC{huc_level}.topojson'
     with open(topo_json_path, 'r') as tj:
         topo_json = json.load(tj)
