@@ -37,16 +37,16 @@ def print_and_log(log_str, logger=None):
     if logger:
         logger.info(log_str)
 
-def get_nrcs_basin_stat(basin_name, huc_level='2', data_type='wteq', 
+def get_nrcs_basin_stat(chart_name, huc_level='2', data_type='wteq', 
                         logger=None):
     
     stat_type_dict = {'wteq': 'Median', 'prec': 'Average'}
-    url = f'{NRCS_CHARTS_URL}/{data_type.upper()}/assocHUC{huc_level}/{basin_name}.html'
+    url = f'{NRCS_CHARTS_URL}/{data_type.upper()}/assocHUC{huc_level}/{chart_name}'
     try:
         response = r_get(url)
         if not response.status_code == 200:
             print_and_log(
-                f'      Skipping {basin_name} {data_type.upper()}, NRCS does not publish stats.',
+                f'      Skipping {chart_name} {data_type.upper()}, NRCS does not publish stats.',
                 logger
             )
             return 'N/A'
@@ -57,7 +57,7 @@ def get_nrcs_basin_stat(basin_name, huc_level='2', data_type='wteq',
         stat = html_txt[swe_re.start():swe_re.end()]
     except Exception as err:
         print_and_log(
-            f'      Error gathering data for {basin_name} - {err}',
+            f'      Error gathering data for {chart_name} - {err}',
             logger
         )
         stat = 'N/A'
@@ -82,6 +82,8 @@ def get_huc_nrcs_stats(huc_level='6', try_all=False, export_dirs=[],
         index_page_strs = ['' for i in index_pg_resps]
     else:
         index_page_strs = [i.text for i in index_pg_resps]
+    global a
+    a = index_page_strs
     topo_json_path = f'./gis/HUC{huc_level}.topojson'
     with open(topo_json_path, 'r') as tj:
         topo_json = json.load(tj)
@@ -92,14 +94,16 @@ def get_huc_nrcs_stats(huc_level='6', try_all=False, export_dirs=[],
     for attr in topo_attrs:
         props = attr['properties']
         huc_name = props['Name']
-        file_name = f'href="{huc_name.replace(" ", "%20")}.html"'
-        if try_all or file_name in index_page_strs[0]:
+        huc_id = props[huc_str]
+        file_name = f'{huc_id}_{huc_name.replace(" ", "_")}.html'
+        href = f'href="{file_name}"'
+        if try_all or href in index_page_strs[0]:
             print_and_log(
                 f'  Getting NRCS PREC stats for {huc_name}...', 
                 logger
             )
             prec_stat = get_nrcs_basin_stat(
-                huc_name, 
+                file_name, 
                 huc_level=huc_level, 
                 data_type='prec',
                 logger=logger
@@ -110,13 +114,13 @@ def get_huc_nrcs_stats(huc_level='6', try_all=False, export_dirs=[],
         else:
             props['prec_percent'] = "N/A"
             prec_stat_dict[huc_name] = "N/A"
-        if try_all or file_name in index_page_strs[1]:
+        if try_all or href in index_page_strs[1]:
             print_and_log(
                 f'  Getting NRCS WTEQ stats for {huc_name}...',
                 logger
             )
             swe_stat = get_nrcs_basin_stat(
-                huc_name, 
+                file_name, 
                 huc_level=huc_level, 
                 data_type='wteq',
                 logger=logger
