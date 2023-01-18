@@ -7,6 +7,7 @@ Created on Fri Apr 24 07:49:12 2020
 
 import re
 import json
+import time
 import pytz
 import logging
 from os import path, makedirs
@@ -17,6 +18,8 @@ from requests import get as r_get
 STATIC_URL = f'https://www.usbr.gov/uc/water/hydrodata/assets'
 NRCS_CHARTS_URL = 'https://www.nrcs.usda.gov/Internet/WCIS/AWS_PLOTS/basinCharts/POR'
 MST = pytz.timezone('MST')
+USE_HUC2 = ("13", "14", "16") # add any needed huc2 ids to add more basins
+THROTTLE_REQ_WAIT_TIME = 0.5
 
 def create_log(path='basin_stats.log'):
     logger = logging.getLogger('basin_stats rotating log')
@@ -94,6 +97,10 @@ def get_huc_nrcs_stats(huc_level='6', try_all=False, export_dirs=[],
         props = attr['properties']
         huc_name = props['Name']
         huc_id = props[huc_str]
+        
+        if not huc_id[:2] in USE_HUC2:
+            continue
+            
         file_name = f'{huc_id}_{huc_name.replace(" ", "_")}.html'
         href = f'href="{file_name}"'
         if try_all or href in index_page_strs[0]:
@@ -130,6 +137,9 @@ def get_huc_nrcs_stats(huc_level='6', try_all=False, export_dirs=[],
         else:
             props['swe_percent'] = "N/A"
             swe_stat_dict[huc_name] = "N/A"
+        if THROTTLE_REQ_WAIT_TIME:
+            time.sleep(THROTTLE_REQ_WAIT_TIME)
+            
     topo_json['objects'][huc_str]['geometries'] = topo_attrs
     
     geo_json_path = f'./gis/HUC{huc_level}.geojson'
