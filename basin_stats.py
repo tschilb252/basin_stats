@@ -20,6 +20,7 @@ NRCS_CHARTS_URL = 'https://www.nrcs.usda.gov/Internet/WCIS/AWS_PLOTS/basinCharts
 MST = pytz.timezone('MST')
 USE_HUC2 = ("13", "14", "16") # add any needed huc2 ids to add more basins
 THROTTLE_REQ_WAIT_TIME = 0.5
+REQUEST_HEADER = {"Request Header": "usbr", "Header value": "Bureau of Reclamation Bot"}
 
 def create_log(path='basin_stats.log'):
     logger = logging.getLogger('basin_stats rotating log')
@@ -46,7 +47,7 @@ def get_nrcs_basin_stat(chart_name, huc_level='2', data_type='wteq',
     stat_type_dict = {'wteq': 'Median', 'prec': 'Average'}
     url = f'{NRCS_CHARTS_URL}/{data_type.upper()}/assocHUC{huc_level}/{chart_name}'
     try:
-        response = r_get(url)
+        response = r_get(url, headers=REQUEST_HEADER)
         if not response.status_code == 200:
             print_and_log(
                 f'      Skipping {chart_name} {data_type.upper()}, NRCS does not publish stats.',
@@ -74,7 +75,7 @@ def get_huc_nrcs_stats(huc_level='6', try_all=False, export_dirs=[],
     data_types = ['prec', 'wteq']
     index_pg_urls = [f'{NRCS_CHARTS_URL}/{i.upper()}/assocHUC{huc_level}' 
                      for i in data_types]
-    index_pg_resps = [r_get(i) for i in index_pg_urls]
+    index_pg_resps = [r_get(i, headers=REQUEST_HEADER) for i in index_pg_urls]
     index_pg_codes = [i.status_code for i in index_pg_resps]
     if not set(index_pg_codes) == set([200]):
         print_and_log(
