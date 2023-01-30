@@ -20,7 +20,7 @@ NRCS_CHARTS_URL = 'https://www.nrcs.usda.gov/Internet/WCIS/AWS_PLOTS/basinCharts
 MST = pytz.timezone('MST')
 USE_HUC2 = ("13", "14", "16") # add any needed huc2 ids to add more basins
 THROTTLE_REQ_WAIT_TIME = 0.5
-REQUEST_HEADER = {"Request Header": "usbr", "Header value": "Bureau of Reclamation Bot"}
+REQUEST_HEADER = {"usbr": "Bureau of Reclamation Bot"}
 
 def create_log(path='basin_stats.log'):
     logger = logging.getLogger('basin_stats rotating log')
