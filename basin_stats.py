@@ -44,7 +44,7 @@ def print_and_log(log_str, logger=None):
 def get_nrcs_basin_stat(chart_name, huc_level='2', data_type='wteq', 
                         logger=None):
     
-    stat_type_dict = {'wteq': 'Median', 'prec': 'Average'}
+    stat_type_dict = {'wteq': 'Median', 'prec': 'Median'}
     url = f'{NRCS_CHARTS_URL}/{data_type.upper()}/assocHUC{huc_level}/{chart_name}'
     try:
         response = r_get(url, headers=REQUEST_HEADER)
